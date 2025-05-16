@@ -66,9 +66,9 @@ resource "aws_s3_bucket" "devops_bucket" {
 
 
 # 33333333
-resource "aws_s3_bucket" "mybucket" {
-  bucket = var.devops-bucket-saksures
-}
+# resource "aws_s3_bucket" "mybucket" {
+#   bucket = var.devops-bucket-saksures
+# }
 
 resource "aws_s3_bucket_ownership_controls" "example" {
   bucket = aws_s3_bucket.devops_bucket.id 
@@ -79,7 +79,7 @@ resource "aws_s3_bucket_ownership_controls" "example" {
 }
 
 #maade public bucket
-resource "aws_s3_bucket_public_access_block" "devops-bucket-saksures" {
+resource "aws_s3_bucket_public_access_block" "devops_bucket" {
   bucket = aws_s3_bucket.devops_bucket.id
 
   block_public_acls       = false

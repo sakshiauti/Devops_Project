@@ -42,6 +42,6 @@ variable "instance_name" {
 #   default = "free-tier-s3-bucket-terraform"
 # }
 
-variable "devops-bucket-saksures" {
-  default = "storage-bucket-terraform"
-}
+# variable "devops-bucket-saksures" {
+#   default = "storage-bucket-terraform"
+# }
