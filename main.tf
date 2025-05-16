@@ -1,5 +1,14 @@
+terraform {
+  required_providers {
+    aws = {
+      source = "hashicorp.aws"
+      version = "~> 5.0"
+    }
+  }
+}
+
 provider "aws" {
-  region = var.region
+  region = "us-east-1"
 }
 
 resource "aws_vpc" "custom_vpc" {
@@ -48,26 +57,32 @@ resource "aws_instance" "free_tier_ec2" {
   }
 }
 
+//s3
 resource "aws_s3_bucket" "devops_bucket" {
-  bucket = "devops-bucket-saksures"
+  bucket = var.devops-bucket-saksures
   
 }
 
-# 33333333
-resource "aws_s3_bucket" "mybucket" {
-  bucket = var.devops-bucket-saksures
+variable "devops-bucket-saksures" {
+  default = "storage-bucket-terraform"
 }
 
+# 33333333
+# resource "aws_s3_bucket" "mybucket" {
+#   bucket = var.devops-bucket-saksures
+# }
+
 resource "aws_s3_bucket_ownership_controls" "example" {
-  bucket = aws_s3_bucket.mybucket.id 
+  bucket = aws_s3_bucket.devops-bucket-saksures.id 
 
   rule {
     object_ownership = "BucketOwnerPreferred"
   }
 }
 
-resource "aws_s3_bucket_public_access_block" "example" {
-  bucket = aws_s3_bucket.mybucket.id
+#maade public bucket
+resource "aws_s3_bucket_public_access_block" "devops-bucket-saksures" {
+  bucket = aws_s3_bucket.devops-bucket-saksures.id
 
   block_public_acls       = false
   block_public_policy     = false
@@ -75,29 +90,41 @@ resource "aws_s3_bucket_public_access_block" "example" {
   restrict_public_buckets = false
 }
 
-resource "aws_s3_bucket_acl" "example" {
+resource "aws_s3_bucket_acl" "devops-bucket-saksures" {
   depends_on = [
     aws_s3_bucket_ownership_controls.example,
-    aws_s3_bucket_public_access_block.example,
+    aws_s3_bucket_public_access_block.devops-bucket-saksures,
   ]
 
-  bucket = aws_s3_bucket.mybucket.id
+  bucket = aws_s3_bucket.devops-bucket-saksures.id
   acl    = "public-read"
 }
 
 resource "aws_s3_object" "index" {
-  bucket = aws_s3_bucket.mybucket.id
+  bucket = aws_s3_bucket.devops-bucket-saksures.id
   key = "index.html"
   source = "index.html"
   acl = "public-read"
   content_type = "text/html"
 }
 
+# resource "aws_s3_object" "error" {
+#   bucket = aws_s3_bucket.devops-bucket-saksures.id
+#   key = "error.html"
+#   source = "error.html"
+#  # acl = "public-read"
+#   content_type = "text/html"
+# }
+
 resource "aws_s3_bucket_website_configuration" "website" {
-  bucket = aws_s3_bucket.mybucket.id
+  bucket = aws_s3_bucket.devops-bucket-saksures.id
   index_document {
     suffix = "index.html"
   }
-
-  depends_on = [ aws_s3_bucket_acl.example ]
+# error_document {
+#   {
+#     key = "error.html"
+#   }
+# }
+  depends_on = [ aws_s3_bucket_acl.devops-bucket-saksures ]
 }
