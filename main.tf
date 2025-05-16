@@ -59,21 +59,19 @@ resource "aws_instance" "free_tier_ec2" {
 
 //s3
 resource "aws_s3_bucket" "devops_bucket" {
-  bucket = var.devops-bucket-saksures
+  bucket = "devops-bucket-saksures"
   
 }
 
-variable "devops-bucket-saksures" {
-  default = "storage-bucket-terraform"
-}
+
 
 # 33333333
-# resource "aws_s3_bucket" "mybucket" {
-#   bucket = var.devops-bucket-saksures
-# }
+resource "aws_s3_bucket" "mybucket" {
+  bucket = var.devops-bucket-saksures
+}
 
 resource "aws_s3_bucket_ownership_controls" "example" {
-  bucket = aws_s3_bucket.devops-bucket-saksures.id 
+  bucket = aws_s3_bucket.devops_bucket.id 
 
   rule {
     object_ownership = "BucketOwnerPreferred"
@@ -82,7 +80,7 @@ resource "aws_s3_bucket_ownership_controls" "example" {
 
 #maade public bucket
 resource "aws_s3_bucket_public_access_block" "devops-bucket-saksures" {
-  bucket = aws_s3_bucket.devops-bucket-saksures.id
+  bucket = aws_s3_bucket.devops_bucket.id
 
   block_public_acls       = false
   block_public_policy     = false
@@ -90,41 +88,29 @@ resource "aws_s3_bucket_public_access_block" "devops-bucket-saksures" {
   restrict_public_buckets = false
 }
 
-resource "aws_s3_bucket_acl" "devops-bucket-saksures" {
+resource "aws_s3_bucket_acl" "devops_bucket" {
   depends_on = [
     aws_s3_bucket_ownership_controls.example,
-    aws_s3_bucket_public_access_block.devops-bucket-saksures,
+    aws_s3_bucket_public_access_block.devops_bucket,
   ]
 
-  bucket = aws_s3_bucket.devops-bucket-saksures.id
+  bucket = aws_s3_bucket.devops_bucket.id
   acl    = "public-read"
 }
 
 resource "aws_s3_object" "index" {
-  bucket = aws_s3_bucket.devops-bucket-saksures.id
+  bucket = aws_s3_bucket.devops_bucket.id
   key = "index.html"
   source = "index.html"
-  acl = "public-read"
+  # acl = "public-read"
   content_type = "text/html"
 }
 
-# resource "aws_s3_object" "error" {
-#   bucket = aws_s3_bucket.devops-bucket-saksures.id
-#   key = "error.html"
-#   source = "error.html"
-#  # acl = "public-read"
-#   content_type = "text/html"
-# }
-
 resource "aws_s3_bucket_website_configuration" "website" {
-  bucket = aws_s3_bucket.devops-bucket-saksures.id
+  bucket = aws_s3_bucket.devops_bucket.id
   index_document {
     suffix = "index.html"
   }
-# error_document {
-#   {
-#     key = "error.html"
-#   }
-# }
-  depends_on = [ aws_s3_bucket_acl.devops-bucket-saksures ]
+
+  depends_on = [ aws_s3_bucket_acl.devops_bucket ]
 }
